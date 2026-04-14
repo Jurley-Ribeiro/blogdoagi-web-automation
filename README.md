@@ -186,7 +186,7 @@ O workflow `.github/workflows/ci.yml`:
 
 ---
 
-## 🏛️ Decisões de Design
+## 🏛️ Decisões de Design Pattern
 
 | Padrão | Aplicação |
 |---|---|
@@ -201,6 +201,12 @@ O workflow `.github/workflows/ci.yml`:
 
 ---
 
-## 👤 Autor
+## 👨‍💻 Desenvolvedor
 
-Desenvolvido para o processo seletivo de QA Automation.
+**Jurley Colares Ribeiro**
+
+- 🔗 LinkedIn: [https://www.linkedin.com/in/jurley-ribeiro/](https://www.linkedin.com/in/jurley-ribeiro/)
+- 🐙 GitHub: [https://github.com/Jurley-Ribeiro](https://github.com/Jurley-Ribeiro)
+- 📧 E-mail: [jurley76@hotmail.com](mailto:jurley76@hotmail.com)
+
+---
