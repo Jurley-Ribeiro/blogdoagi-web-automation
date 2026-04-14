@@ -1,0 +1,76 @@
+name: 🤖 Web Automation - Blog do Agi
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser para execução dos testes'
+        required: true
+        default: 'chrome'
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
+
+jobs:
+  test:
+    name: Testes Web (${{ github.event.inputs.browser || 'chrome' }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: ☕ Configurar Java 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 🌐 Instalar Google Chrome
+        uses: browser-actions/setup-chrome@latest
+
+      - name: 🦊 Instalar Mozilla Firefox
+        uses: browser-actions/setup-firefox@latest
+
+      - name: 🔨 Build do projeto (sem testes)
+        run: mvn clean compile -q
+
+      - name: 🧪 Executar testes
+        run: |
+          mvn test \
+            -Dbrowser=${{ github.event.inputs.browser || 'chrome' }} \
+            -Dheadless=true
+        env:
+          DISPLAY: :99
+
+      - name: 📊 Publicar relatório de testes (JUnit XML)
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Cucumber Test Results
+          path: target/cucumber-reports/cucumber.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: 📁 Upload dos relatórios Cucumber
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cucumber-reports-${{ github.event.inputs.browser || 'chrome' }}
+          path: target/cucumber-reports/
+          retention-days: 30
+
+      - name: 📁 Upload dos screenshots de falhas
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: screenshots-${{ github.run_number }}
+          path: target/screenshots/
+          retention-days: 7

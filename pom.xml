@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>br.com.agi.qa</groupId>
+    <artifactId>blogdoagi-web-automation</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>Blog do Agi - Web Automation</name>
+    <description>Automação de testes Web para o Blog do Agi usando Java, Cucumber e Selenium</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- ================================================================ -->
+        <!-- Padrões para execução local. Sobrescreva via -D na linha de cmd: -->
+        <!--   mvn test -Dbrowser=firefox -Dheadless=true                    -->
+        <!-- O IntelliJ também resolve essas propriedades no pom corretamente -->
+        <!-- ================================================================ -->
+        <browser>chrome</browser>
+        <headless>false</headless>
+
+        <!-- Versões das dependências -->
+        <selenium.version>4.18.1</selenium.version>
+        <!--
+            WebDriverManager 5.7.0 possui CVE-2025-4641 (XXE injection, CVSS 9.4).
+            Atualizado para 5.9.2 que corrige a vulnerabilidade.
+        -->
+        <webdrivermanager.version>5.9.2</webdrivermanager.version>
+        <cucumber.version>7.15.0</cucumber.version>
+        <junit.version>4.13.2</junit.version>
+        <assertj.version>3.25.1</assertj.version>
+        <slf4j.version>2.0.12</slf4j.version>
+
+        <!-- Versões dos plugins -->
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+    </properties>
+
+    <dependencies>
+        <!-- ==================== SELENIUM ==================== -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- ==================== WEBDRIVER MANAGER ==================== -->
+        <!-- Gerencia automaticamente os binários dos browsers drivers -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager.version}</version>
+        </dependency>
+
+        <!-- ==================== CUCUMBER ==================== -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ==================== JUNIT ==================== -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ==================== ASSERTJ ==================== -->
+        <!-- Assertions fluentes e legíveis -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ==================== LOGGING ==================== -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire - execução dos testes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <!--
+                        Repassa as propriedades Maven como System Properties para a JVM de teste.
+                        Os valores padrão estão definidos em <properties> acima.
+                        Override via: mvn test -Dbrowser=firefox -Dheadless=true
+                    -->
+                    <systemPropertyVariables>
+                        <browser>${browser}</browser>
+                        <headless>${headless}</headless>
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/runner/**Test*.java</include>
+                        <include>**/runner/**Runner*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
