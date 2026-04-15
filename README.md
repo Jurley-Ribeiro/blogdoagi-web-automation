@@ -1,6 +1,6 @@
 # 🤖 Blog do Agi — Web Test Automation
 
-Projeto de automação de testes Web para o [Blog do Agi](https://blog.agibank.com.br/), desenvolvido como parte do processo seletivo para a vaga de QA Automation.
+Projeto de automação de testes Web para o [Blog do Agi](https://blog.agibank.com.br/) - QA.
 
 ---
 
@@ -15,6 +15,7 @@ Projeto de automação de testes Web para o [Blog do Agi](https://blog.agibank.c
 | JUnit | 4.13.2 | Runner dos testes |
 | WebDriverManager | 5.9.2 | Download automático dos drivers |
 | AssertJ | 3.25.1 | Assertions fluentes |
+| Allure | 2.27.0 | Relatórios interativos |
 
 ---
 
@@ -56,6 +57,7 @@ src/
 - **Java 21+** → [Download Temurin](https://adoptium.net/)
 - **Maven 3.8+** → [Download](https://maven.apache.org/download.cgi)
 - **Um dos browsers instalados:** Google Chrome, Mozilla Firefox ou Microsoft Edge
+- **Allure Commandline** → Para gerar relatórios (ver seção de instalação abaixo)
 
 > 💡 **Drivers não precisam ser baixados manualmente.** O WebDriverManager gerencia isso.
 
@@ -69,42 +71,56 @@ src/
 git clone https://github.com/SEU_USUARIO/blogdoagi-web-automation.git
 cd blogdoagi-web-automation
 ```
+### 2. Opção A: Usando Make (recomendado para Linux/Mac/Git Bash)
 
-### 2. Executar todos os testes
+> Requer `make` instalado (padrão no Linux/Mac; no Windows use Git Bash ou WSL).
 
-```bash
-mvn clean test
-```
+| Comando | Descrição |
+|---|---|
+| `make test` | Todos os testes + relatório Allure |
+| `make smoke` | Apenas smoke tests |
+| `make search` | Apenas testes de busca |
+| `make headless` | Modo headless (sem abrir browser) |
+| `make firefox` | Executa no Firefox |
+| `make ci` | Modo CI: headless + gera relatório sem abrir browser |
+| `make clean` | Remove resultados e relatórios anteriores |
+| `make tags TAGS="@smoke and not @bug"` | Filtra por tag customizada |
+| `make help` | Lista todos os comandos |
 
-### 3. Executar por browser
+### 2. Opção B: Usando Maven diretamente (qualquer sistema)
 
-```bash
-mvn clean test -Dbrowser=firefox
-mvn clean test -Dbrowser=edge
-mvn clean test -Dbrowser=chrome   # padrão
-```
+ *Executar todos os testes*
+ 
+`mvn clean test`
 
-### 4. Modo headless (CI/CD)
+ *Executar apenas smoke tests*
 
-```bash
-mvn clean test -Dheadless=true
-```
+`mvn clean test -Dcucumber.filter.tags="@smoke"`
 
-### 5. Filtrar por tag
+ *Executar apenas testes de busca*
 
-```bash
-# Apenas smoke tests
-mvn clean test -Dcucumber.filter.tags="@smoke"
+`mvn clean test -Dcucumber.filter.tags="@search"`
 
-# Apenas testes de busca
-mvn clean test -Dcucumber.filter.tags="@search"
+*Executar em modo headless*
 
-# Excluir cenários de bug documentado
-mvn clean test -Dcucumber.filter.tags="not @bug"
+`mvn clean test -Dheadless=true`
 
-# Smoke sem bugs (recomendado para pipeline)
-mvn clean test -Dcucumber.filter.tags="@smoke and not @bug"
-```
+*Executar no Firefox*
+
+`mvn clean test -Dbrowser=firefox`
+
+### 3. Exemplo prático
+
+*Linux/Mac (com make)*
+> make search &emsp;&emsp; *(Executa testes de busca)*\
+> make smoke  &emsp;&emsp; *(Executa smoke tests)*\
+> make test   &emsp;&emsp;&emsp; *(Executa tudo)*
+
+*Windows (Git Bash)*
+> make search  &emsp;&emsp; *(Funciona igual ao Linux/Mac)*
+
+*Qualquer sistema (Maven puro)*
+> mvn clean test -Dcucumber.filter.tags="@search"
 
 ---
 
