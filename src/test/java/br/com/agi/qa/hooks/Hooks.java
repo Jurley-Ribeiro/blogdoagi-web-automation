@@ -57,11 +57,29 @@ public class Hooks {
     // Helpers
     // -------------------------------------------------------------------------
 
+//    private void captureScreenshot(final Scenario scenario) {
+//        try {
+//            WebDriver driver = DriverManager.getDriver();
+//            byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+//            scenario.attach(screenshot, "image/png", "Screenshot - Falha no cenário");
+//            log.warn("📸 Screenshot capturado para o cenário falho: [{}]", scenario.getName());
+//        } catch (Exception e) {
+//            log.error("Não foi possível capturar screenshot: {}", e.getMessage());
+//        }
+//    }
+
     private void captureScreenshot(final Scenario scenario) {
         try {
             WebDriver driver = DriverManager.getDriver();
             byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-            scenario.attach(screenshot, "image/png", "Screenshot - Falha no cenário");
+
+            io.qameta.allure.Allure.addAttachment(
+                    "Screenshot - " + scenario.getName(),
+                    "image/png",
+                    new java.io.ByteArrayInputStream(screenshot),
+                    "png"
+            );
+
             log.warn("📸 Screenshot capturado para o cenário falho: [{}]", scenario.getName());
         } catch (Exception e) {
             log.error("Não foi possível capturar screenshot: {}", e.getMessage());

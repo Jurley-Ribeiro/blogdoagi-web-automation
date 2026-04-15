@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,8 +150,37 @@ public class SearchPage extends BasePage {
      *
      * @return a própria página
      */
+//    public SearchPage closeSearchOverlay() {
+//        waitForClickability(closeOverlayButton).click();
+//        return this;
+//    }
+
     public SearchPage closeSearchOverlay() {
-        waitForClickability(closeOverlayButton).click();
+        try {
+            // Aguarda o botão ficar clicável
+            WebElement closeButton = waitForClickability(closeOverlayButton);
+
+            // Tenta clique normal
+            try {
+                closeButton.click();
+            } catch (Exception e) {
+                // Fallback: JavaScript click
+                log.warn("Clique normal falhou, usando JavaScript click");
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
+            }
+
+            // Aguarda o overlay desaparecer (aumenta o timeout)
+            wait.until(ExpectedConditions.invisibilityOf(searchOverlay));
+
+            // Pequena pausa para garantir que a animação terminou
+            Thread.sleep(500);
+
+        } catch (Exception e) {
+            log.error("Erro ao fechar overlay: {}", e.getMessage());
+            // Tenta ESC como último recurso
+            driver.findElement(By.tagName("body")).sendKeys(Keys.ESCAPE);
+        }
+
         return this;
     }
 
@@ -270,13 +301,56 @@ public class SearchPage extends BasePage {
     }
 
     /**
+     * Retorna o texto do título da página de resultados de busca.
+     * Exemplo: "Resultados encontrados para: xyzqwerty123456789"
+     *
+     * @return texto do título ou string vazia se não encontrado
+     */
+    public String getSearchResultsTitle() {
+        try {
+            WebElement title = waitForVisibility(
+                    By.cssSelector(".ast-archive-title, .page-title, h1.page-title")
+            );
+            return title.getText();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * Retorna o texto da mensagem exibida quando nenhum resultado é encontrado.
+     * Exemplo: "Lamentamos, mas nada foi encontrado para sua pesquisa..."
+     *
+     * @return texto da mensagem ou string vazia se não encontrado
+     */
+    public String getNoResultsMessageText() {
+        try {
+            WebElement message = waitForVisibility(
+                    By.cssSelector(".no-results .page-content p, .not-found .page-content p")
+            );
+            return message.getText();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
      * Verifica se a URL atual é a de uma página de resultados de busca.
      * O WordPress usa o parâmetro {@code ?s=} na URL de busca.
      *
      * @return {@code true} se a URL contiver o parâmetro de busca
      */
     public boolean isOnSearchResultsPage() {
-        return getCurrentUrl().contains("?s=") || getCurrentUrl().contains("&s=");
+        try {
+            wait.until(ExpectedConditions.or(
+                    ExpectedConditions.urlContains("?s="),
+                    ExpectedConditions.urlContains("&s=")
+            ));
+            return true;
+        } catch (Exception e) {
+            log.warn("Timeout aguardando URL de resultados. URL atual: {}", getCurrentUrl());
+            return false;
+        }
     }
 
     /**

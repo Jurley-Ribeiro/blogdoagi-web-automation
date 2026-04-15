@@ -96,6 +96,24 @@ public class SearchSteps {
                 .isFalse();
     }
 
+    @Então("o título da página de resultados deve conter o termo pesquisado {string}")
+    public void oTituloDaPaginaDeResultadosDeveConterOTermoPesquisado(final String term) {
+        String titulo = searchPage.getSearchResultsTitle();
+        assertThat(titulo)
+                .as("O título da página de resultados deve conter o termo '%s'. Título atual: '%s'",
+                        term, titulo)
+                .containsIgnoringCase(term);
+    }
+
+    @Então("a mensagem de nenhum resultado deve conter {string}")
+    public void aMensagemDeNenhumResultadoDeveConter(final String expectedMessage) {
+        String mensagem = searchPage.getNoResultsMessageText();
+        assertThat(mensagem)
+                .as("A mensagem de 'sem resultados' deve conter '%s'. Mensagem atual: '%s'",
+                        expectedMessage, mensagem)
+                .containsIgnoringCase(expectedMessage);
+    }
+
     // -------------------------------------------------------------------------
     // When / Quando
     // -------------------------------------------------------------------------
